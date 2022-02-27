@@ -49,7 +49,7 @@ def getStatementData(userInput):
     income_statement = annual_report["StatementsOfIncome"]
 
 
-    #retrieving total revenue from income statement
+    #retrieving total revenue ($) from income statement
     if "RevenueFromContractWithCustomerExcludingAssessedTax" in income_statement:
         for revenue in income_statement["RevenueFromContractWithCustomerExcludingAssessedTax"]:
             if "segment" not in revenue:
@@ -86,11 +86,11 @@ def getStatementData(userInput):
     else:
         for key in income_statement:
             if "CostOf" in key:
-                simple_data["Gross Profit ($)"] = (simple_data["Revenue"] - float(income_statement[key][0]["value"])) / MIL
+                simple_data["Gross Profit ($)"] = (simple_data["Revenue ($)"] - float(income_statement[key][0]["value"])) / MIL
 
     #calculating gross profit margin
     try:
-        simple_data["Gross Profit Margin (%)"] = round(simple_data["Gross Profit"] / simple_data["Revenue"] * 100, 2)
+        simple_data["Gross Profit Margin (%)"] = round(simple_data["Gross Profit"] / simple_data["Revenue ($)"] * 100, 2)
     except:
         simple_data["Gross Profit Margin (%)"] = None
 
@@ -105,7 +105,7 @@ def getStatementData(userInput):
 
     #calculating net profit margin
     try:
-        simple_data["Net Profit Margin (%)"] = round(simple_data["Net Income"] / (simple_data["Revenue"] + simple_data["Other Income"]) * 100, 2)
+        simple_data["Net Profit Margin (%)"] = round(simple_data["Net Income"] / (simple_data["Revenue ($)"] + simple_data["Other Income"]) * 100, 2)
     except:
         simple_data["Net Profit Margin (%)"] = None
 
