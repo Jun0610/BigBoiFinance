@@ -19,7 +19,8 @@ def display_report(request):
         form = companyForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['company_name']
-            sample = getStatementData(name)
+            #update name to show company's name
+            name, sample = getStatementData(name)
 
             return render(request, 'administration/display.html', {'sample': sample, 'name': name})
     else:

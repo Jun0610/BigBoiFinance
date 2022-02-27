@@ -2,8 +2,8 @@ from sec_api import QueryApi
 from sec_api import XbrlApi
 import json
 
-queryApi = QueryApi(api_key="7d84412d1c2236517aba57d5aab13020072b7eb116b10f3e0855189cd840e682")
-xbrlApi = XbrlApi("7d84412d1c2236517aba57d5aab13020072b7eb116b10f3e0855189cd840e682")
+queryApi = QueryApi(api_key="c66a2db17ba0bfe10653604a48311c8020dd7068e68a0d591e664d955bc2f406")
+xbrlApi = XbrlApi("c66a2db17ba0bfe10653604a48311c8020dd7068e68a0d591e664d955bc2f406")
 
 def getStatementData(userInput):
     user_input = userInput
@@ -26,7 +26,9 @@ def getStatementData(userInput):
         }
 
         filings = queryApi.get_filings(query)
-        print(json.dumps(filings, indent=4))
+        f = open("test.json", "w")
+        json.dump(filings, f, indent=4)
+        f.close()
 
         if filings['filings'] == []:
             print("Invalid company name!")
@@ -79,21 +81,13 @@ def getStatementData(userInput):
         simple_data["Other Income ($)"] += float(income_statement["InvestmentIncomeInterest"][0]["value"]) / MIL
 
 
-
     #retrieving gross profit from income statement
     if "GrossProfit" in income_statement:
         simple_data["Gross Profit ($)"] =  float(income_statement["GrossProfit"][0]["value"]) / MIL
     else:
         for key in income_statement:
             if "CostOf" in key:
-                simple_data["Gross Profit ($)"] = (simple_data["Revenue ($)"] - float(income_statement[key][0]["value"])) / MIL
-
-    #calculating gross profit margin
-    try:
-        simple_data["Gross Profit Margin (%)"] = round(simple_data["Gross Profit"] / simple_data["Revenue ($)"] * 100, 2)
-    except:
-        simple_data["Gross Profit Margin (%)"] = None
-
+                simple_data["Gross Profit ($)"] = (simple_data["Revenue ($)"] * MIL - float(income_statement[key][0]["value"])) / MIL
 
 
     #retrieving net income from income statement
@@ -103,17 +97,12 @@ def getStatementData(userInput):
         simple_data["Net Income ($)"] = None
 
 
-    #calculating net profit margin
-    try:
-        simple_data["Net Profit Margin (%)"] = round(simple_data["Net Income"] / (simple_data["Revenue ($)"] + simple_data["Other Income"]) * 100, 2)
-    except:
-        simple_data["Net Profit Margin (%)"] = None
-
     #retrieving diluted earnings per share
     if "EarningsPerShareDiluted" in income_statement:
         simple_data["Diluted Earnings Per Share ($/Share)"] = "{:.2f}".format(float(income_statement["EarningsPerShareDiluted"][0]["value"]))
     else:
         simple_data["Diluted Earnings Per Share ($/Share)"] = None
+
 
     #retrieving common stock outstanding
     if "EntityCommonStockSharesOutstanding" in annual_report["CoverPage"]:
@@ -128,6 +117,21 @@ def getStatementData(userInput):
 
     else:
         simple_data["Common Stock Shares Outstanding"] = None
+
+
+    #calculating gross profit margin
+    try:
+        simple_data["Gross Profit Margin (%)"] = round(simple_data["Gross Profit ($)"] / simple_data["Revenue ($)"] * 100, 2)
+    except:
+        simple_data["Gross Profit Margin (%)"] = None
+
+
+    #calculating net profit margin
+    try:
+        simple_data["Net Profit Margin (%)"] = round(simple_data["Net Income ($)"] / (simple_data["Revenue ($)"] + simple_data["Other Income ($)"]) * 100, 2)
+    except:
+        simple_data["Net Profit Margin (%)"] = None
+
 
 
     #retrieving data from balance sheet
@@ -150,6 +154,8 @@ def getStatementData(userInput):
 
     if "Liabilities" in balance_sheet:
         simple_data["Total Liablities ($)"] = float(balance_sheet["Liabilities"][0]["value"]) / MIL
+    elif "LiabilitiesAndStockholdersEquity" in balance_sheet and "StockholdersEquity" in balance_sheet:
+        simple_data["Total Liablities ($)"] = (float(balance_sheet["LiabilitiesAndStockholdersEquity"][0]["value"]) - float(balance_sheet["StockholdersEquity"][0]["value"])) / MIL
     else:
         simple_data["Total Liablities ($)"] = None
 
@@ -167,20 +173,20 @@ def getStatementData(userInput):
 
     #calculating current ratio
     try:    
-        simple_data["Current Ratio"] = round(simple_data["Current Assets"] / simple_data["Current Liabilities"], 2)
+        simple_data["Current Ratio"] = round(simple_data["Current Assets ($)"] / simple_data["Current Liabilities ($)"], 2)
     except:
         simple_data["Current Ratio"] = None
 
     #calculating return on equity
     try:
-        simple_data["Return on Equity"] = round(simple_data["Net Income"] / simple_data["Total Stockholders Equity"], 2)
+        simple_data["Return on Equity"] = round(simple_data["Net Income ($)"] / simple_data["Total Stockholders Equity ($)"], 2)
     except:
         simple_data["Return on Equity"] = None
 
     try:
-        simple_data["Return on Assets"] = round(simple_data["Net Income"] / simple_data["Total Assets"], 2)
+        simple_data["Return on Assets"] = round(simple_data["Net Income ($)"] / simple_data["Total Assets ($)"], 2)
     except:
         simple_data["Return on Assets"] = None
 
     print(simple_data)
-    return simple_data
+    return annual_report["CoverPage"]["EntityRegistrantName"], simple_data
