@@ -59,7 +59,7 @@ def getStatementData(userInput):
     if "Revenues" in income_statement:
         simple_data["Revenue ($)"] = float(income_statement["Revenues"][0]["value"]) / MIL
 
-    if "Revenue" not in simple_data:
+    if "Revenue ($)" not in simple_data:
         simple_data["Revenue ($)"] = None
 
 
