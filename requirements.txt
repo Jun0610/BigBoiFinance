@@ -1,5 +1,5 @@
 sec-api
-django
+django==3.0.14
 gunicorn
 django-heroku
 dj_database_url
