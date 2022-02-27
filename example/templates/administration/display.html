@@ -16,8 +16,11 @@
 
 <body style="background-color: #364958; align-items: center">
     <h1 style="color: #c9e4ca">
-        You have requested information from {{ name }}.
+        You have requested {{ name }}'s latest financials!
     </h1>
+    <h4 style="color: #c9e4ca">
+       Monetary values are represented in millions of USD.
+    </h4>
     <table style="margin-left: auto; margin-right: auto">
         {% for key, value in sample.items %}
         <tr style="margin: 3rem">
