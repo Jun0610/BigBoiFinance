@@ -1,4 +1,3 @@
-from tkinter.ttk import Style
 from django import forms
 
 class companyForm(forms.Form):
