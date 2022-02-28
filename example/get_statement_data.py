@@ -34,7 +34,16 @@ def getStatementData(userInput):
             print("Invalid company name!")
             quit()
 
-        annual_report_url = filings['filings'][0]["linkToFilingDetails"]
+        annual_report_url = ''
+
+        for item in filings['filings']:
+            if item['formType'] == '10-K' and str(user_input).casefold() in item['companyName'].casefold():
+                annual_report_url = item["linkToFilingDetails"]
+                break
+        
+        if annual_report_url == '':
+            print("Could not find link")
+            quit()
 
         # 10-K HTM File URL example
         xbrl_json = xbrlApi.xbrl_to_json(
@@ -47,6 +56,10 @@ def getStatementData(userInput):
         f.close()
 
     simple_data = {}
+
+    if annual_report == {}:
+        print("Invalid company name!")
+        quit()
 
     income_statement = annual_report["StatementsOfIncome"]
 
@@ -189,4 +202,10 @@ def getStatementData(userInput):
         simple_data["Return on Assets"] = None
 
     print(simple_data)
-    return annual_report["CoverPage"]["EntityRegistrantName"], simple_data
+
+    if type(annual_report["CoverPage"]["EntityRegistrantName"]) == list:
+        name = annual_report["CoverPage"]["EntityRegistrantName"][0]
+    else:
+        name = annual_report["CoverPage"]["EntityRegistrantName"]
+
+    return name, simple_data
