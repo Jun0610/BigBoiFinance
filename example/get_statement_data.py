@@ -2,8 +2,8 @@ from sec_api import QueryApi
 from sec_api import XbrlApi
 import json
 
-queryApi = QueryApi(api_key="c66a2db17ba0bfe10653604a48311c8020dd7068e68a0d591e664d955bc2f406")
-xbrlApi = XbrlApi("c66a2db17ba0bfe10653604a48311c8020dd7068e68a0d591e664d955bc2f406")
+queryApi = QueryApi(api_key="56c351c5f3497a681e365d6be92476e4e17c6a183652127244d3cc0af1b1f10a")
+xbrlApi = XbrlApi("56c351c5f3497a681e365d6be92476e4e17c6a183652127244d3cc0af1b1f10a")
 
 def getStatementData(userInput):
     user_input = userInput
